@@ -9,9 +9,23 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from matplotlib import font_manager
 
 from .data import imm_features, simulate_trajectory
 from .model import PositionPredictor
+
+
+def configure_chinese_font() -> None:
+    candidate_fonts = [
+        Path("/mnt/c/Windows/Fonts/msyh.ttc"),
+        Path("/mnt/c/Windows/Fonts/simhei.ttf"),
+    ]
+    for font_path in candidate_fonts:
+        if font_path.exists():
+            font_manager.fontManager.addfont(str(font_path))
+            plt.rcParams["font.family"] = font_manager.FontProperties(fname=str(font_path)).get_name()
+            break
+    plt.rcParams["axes.unicode_minus"] = False
 
 
 def main() -> None:
@@ -40,6 +54,7 @@ def main() -> None:
     print(f"预测下一位置：[{prediction[0]:.2f}, {prediction[1]:.2f}]")
     print(f"欧氏误差：{error:.3f}")
 
+    configure_chinese_font()
     plt.figure(figsize=(7, 5))
     plt.plot(trajectory.truth[:, 0], trajectory.truth[:, 1], "-o", label="真实轨迹")
     plt.scatter(trajectory.measurements[:, 0], trajectory.measurements[:, 1], marker="x", label="定位观测")
