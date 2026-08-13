@@ -24,15 +24,20 @@ def standardize_fit(features: np.ndarray, labels: np.ndarray) -> tuple[np.ndarra
         "feature_mean": feature_mean.tolist(), "feature_std": feature_std.tolist(),
         "label_mean": label_mean.tolist(), "label_std": label_std.tolist(),
     }
-    return (features - feature_mean) / feature_std, (labels - label_mean) / label_std, metadata
+    normalized_features = ((features - feature_mean) / feature_std).astype(np.float32)
+    normalized_labels = ((labels - label_mean) / label_std).astype(np.float32)
+    return normalized_features, normalized_labels, metadata
 
 
 def standardize_apply(features: np.ndarray, labels: np.ndarray, metadata: dict[str, list[float]]) -> tuple[np.ndarray, np.ndarray]:
     """按训练集统计量处理验证集。"""
-    return (
-        (features - np.asarray(metadata["feature_mean"])) / np.asarray(metadata["feature_std"]),
-        (labels - np.asarray(metadata["label_mean"])) / np.asarray(metadata["label_std"]),
-    )
+    feature_mean = np.asarray(metadata["feature_mean"], dtype=np.float32)
+    feature_std = np.asarray(metadata["feature_std"], dtype=np.float32)
+    label_mean = np.asarray(metadata["label_mean"], dtype=np.float32)
+    label_std = np.asarray(metadata["label_std"], dtype=np.float32)
+    normalized_features = ((features - feature_mean) / feature_std).astype(np.float32)
+    normalized_labels = ((labels - label_mean) / label_std).astype(np.float32)
+    return normalized_features, normalized_labels
 
 
 def parse_args() -> argparse.Namespace:
